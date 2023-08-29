@@ -20,7 +20,6 @@ typedef struct pacam_object pacam_object;
 
 /* Function type for callbacks used in interactable objects. */
 typedef struct pacam_callback pacam_callback;
-// typedef void (*pacam_callback)(pacam_game *game);
 
 pacam_game *pacam_init();
 
@@ -28,7 +27,7 @@ void pacam_close(pacam_game *game);
 
 pacam_scene *pacam_new_scene(pacam_game *game);
 
-void pacam_add_object(pacam_scene *target, pacam_object *object, pacam_callback *callback);
+void pacam_add_object(pacam_game *game, pacam_scene *target, pacam_object *object, pacam_callback *callback);
 
 void pacam_run(pacam_game *game);
 

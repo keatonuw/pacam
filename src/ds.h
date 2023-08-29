@@ -16,8 +16,6 @@ typedef void (*dtor)(void *el);
 
 typedef struct array_list array_list;
 
-// void dtor_no_op(void *el) {}
-
 array_list *array_list_alloc();
 
 void array_list_free(array_list *list, dtor fn);

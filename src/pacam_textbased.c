@@ -15,6 +15,7 @@ struct pacam_game
 {
   pacam_scene *cur_scene;
   array_list *scene_list;
+  array_list *object_list;
 };
 
 // scene has a name, desc, and list of objects it contains
@@ -41,6 +42,8 @@ struct pacam_callback
   void *data;
 };
 
+void dtor_no_op(void *el) {}
+
 void pacam_object_free(void *ptr)
 {
   pacam_object *object = (pacam_object *)ptr;
@@ -55,13 +58,14 @@ void pacam_object_free(void *ptr)
 void pacam_scene_free(void *ptr)
 {
   pacam_scene *scene = (pacam_scene *)ptr;
-  array_list_free(scene->object_list, pacam_object_free);
+  array_list_free(scene->object_list, dtor_no_op);
   free(scene);
 }
 
 pacam_game *pacam_init()
 {
   pacam_game *game = (pacam_game *)malloc(sizeof(pacam_game));
+  game->object_list = array_list_alloc();
   game->scene_list = array_list_alloc();
   return game;
 }
@@ -69,6 +73,7 @@ pacam_game *pacam_init()
 void pacam_close(pacam_game *game)
 {
   array_list_free(game->scene_list, pacam_scene_free);
+  array_list_free(game->object_list, pacam_object_free);
   free(game);
 }
 
@@ -92,12 +97,13 @@ pacam_scene *pacam_text_scene(pacam_game *game, char *name, char *desc)
 }
 
 // creates a new object and adds it to the scene
-pacam_object *pacam_text_object(pacam_scene *scene, char *name, char *desc, pacam_callback *callback)
+pacam_object *pacam_text_object(pacam_game *game, pacam_scene *scene, char *name, char *desc, pacam_callback *callback)
 {
   pacam_object *object = (pacam_object *)malloc(sizeof(pacam_object));
   strncpy(object->name, name, 16);
   strncpy(object->desc, desc, 128);
   object->on_click = callback;
+  array_list_add(game->object_list, (void *)object);
   array_list_add(scene->object_list, (void *)object);
   return object;
 }
@@ -163,11 +169,11 @@ int main(int argc, char **argv)
 
   // add a 'button' type object to the entry_scene.
   // when interacted with, this button switches the game's cur_scene to room_scene.
-  pacam_object *start_game_obj = pacam_text_object(entry_scene, "start", "interact to start!", switch_scene(room_scene));
+  pacam_object *start_game_obj = pacam_text_object(game, entry_scene, "start", "interact to start!", switch_scene(room_scene));
 
   // and another to exit
-  pacam_object *end_game_obj = pacam_text_object(room_scene, "exit", "interact to stop", switch_scene(NULL));
-  pacam_object *return_game_obj = pacam_text_object(room_scene, "return to menu", "interact to go to menu", switch_scene(entry_scene));
+  pacam_object *end_game_obj = pacam_text_object(game, room_scene, "exit", "interact to stop", switch_scene(NULL));
+  pacam_object *return_game_obj = pacam_text_object(game, room_scene, "return to menu", "interact to go to menu", switch_scene(entry_scene));
 
   // set the game's cur_scene to entry_scene.
   game->cur_scene = entry_scene;

@@ -2,7 +2,7 @@
 CC := gcc
 
 # Compiler flags
-CFLAGS := $(shell sdl2-config --cflags)
+CFLAGS := $(shell sdl2-config --cflags) -g
 
 # Linker flags
 LDFLAGS := $(shell sdl2-config --libs)
