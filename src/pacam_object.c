@@ -65,4 +65,5 @@ void *pacam_object_get_data(pacam_object *object)
 
 void pacam_object_interact(pacam_object *object)
 {
+  pacam_call(object->on_click);
 }

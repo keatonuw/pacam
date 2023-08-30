@@ -61,6 +61,11 @@ void pacam_close(pacam_game *game);
 void pacam_run(pacam_game *game, pacam_scene *init_scene);
 
 /*
+  Get the current scene.
+*/
+pacam_scene *pacam_get_cur_scene(pacam_game *game);
+
+/*
   Sets the current scene displayed in a PACAM game.
 */
 void pacam_set_cur_scene(pacam_game *game, pacam_scene *scene);
