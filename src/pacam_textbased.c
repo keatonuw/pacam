@@ -27,7 +27,7 @@ void print_scene(pacam_scene *scene)
   printf("\nScene: %s: %s\n", pacam_scene_get_name(scene), pacam_scene_get_desc(scene));
   pacam_scene_for_each_object(scene, print_object);
 }
-
+/*
 void pacam_run(pacam_game *game, pacam_scene *init_scene)
 {
   pacam_set_cur_scene(game, init_scene);
@@ -46,3 +46,4 @@ void pacam_run(pacam_game *game, pacam_scene *init_scene)
     pacam_object_interact(object);
   }
 }
+*/
