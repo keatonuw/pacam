@@ -39,8 +39,8 @@ pacam_scene *pacam_new_scene(pacam_game *game, char *name, char *desc, void *dat
 {
   pacam_scene *scene = (pacam_scene *)malloc(sizeof(pacam_scene));
   scene->object_list = array_list_alloc();
-  strncpy(object->name, name, 16);
-  strncpy(object->desc, desc, 128);
+  strncpy(scene->name, name, 16);
+  strncpy(scene->desc, desc, 128);
   scene->data = data;
   scene->data_dtor = data_dtor;
   pacam_register_scene(game, scene);
@@ -62,6 +62,11 @@ void pacam_scene_add_object(pacam_scene *scene, pacam_object *object)
   array_list_add(scene->object_list, object);
 }
 
+pacam_object *pacam_scene_get_object(pacam_scene *scene, int i)
+{
+  return array_list_get(scene->object_list, i);
+}
+
 char *pacam_scene_get_name(pacam_scene *scene)
 {
   return scene->name;
@@ -77,7 +82,7 @@ void *pacam_scene_get_data(pacam_scene *scene)
   return scene->data;
 }
 
-void *pacam_scene_for_each_object(pacam_scene *scene, pacam_object_callback fn)
+void pacam_scene_for_each_object(pacam_scene *scene, pacam_object_callback fn)
 {
   for (int i = 0; i < array_list_size(scene->object_list); i++)
   {

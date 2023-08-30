@@ -50,6 +50,18 @@ void pacam_call(pacam_callback *callback)
 
 //===========================================================================//
 
+void pc_no_op_handler(pacam_game *game, void *data)
+{
+  return;
+}
+
+pacam_callback *pc_no_op(pacam_game *game)
+{
+  return create_callback(game, pc_no_op_handler, NULL, dtor_no_op);
+}
+
+//===========================================================================//
+
 void pc_handle_scene(pacam_game *game, void *data)
 {
   pacam_scene *scene = (pacam_scene *)data;

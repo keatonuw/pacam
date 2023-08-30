@@ -7,6 +7,7 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <stdlib.h>
+#include <string.h>
 
 #include "pacam.h"
 #include "ds.h"
@@ -26,19 +27,25 @@ void pacam_object_free(void *ptr)
   // if there's a callback, free that.
   if (object->on_click != NULL)
   {
-    free(object->on_click);
+    free_callback(object->on_click);
   }
   free(object);
 }
 
-pacam_object *pacam_new_object(pacam_game *game, char *name, char *desc, pacam_callback *callback)
+pacam_object *pacam_new_object(pacam_game *game, char *name, char *desc, void *data, pacam_callback *callback)
 {
   pacam_object *object = (pacam_object *)malloc(sizeof(pacam_object));
   strncpy(object->name, name, 16);
   strncpy(object->desc, desc, 128);
+  object->data = data;
   object->on_click = callback;
-  array_list_add(game->object_list, (void *)object);
+  pacam_register_object(game, object);
   return object;
+}
+
+pacam_object *pacam_new_object_base(pacam_game *game, char *name, char *desc)
+{
+  return pacam_new_object(game, name, desc, NULL, pc_no_op(game));
 }
 
 char *pacam_object_get_name(pacam_object *object)

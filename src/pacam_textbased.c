@@ -17,7 +17,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
   Toy implementation of pacam.h which demonstrates using the interface
   for a text-based adventure type of game.
 */
-
+/*
 pacam_scene *pacam_text_scene(pacam_game *game, char *name, char *desc)
 {
   pacam_scene *scene = pacam_new_scene(game);
@@ -116,3 +116,4 @@ int main(int argc, char **argv)
 
   return EXIT_SUCCESS;
 }
+*/

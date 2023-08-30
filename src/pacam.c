@@ -15,3 +15,8 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
 #include "ds.h"
 
 void dtor_no_op(void *el) {}
+
+int main(int argc, char **argv)
+{
+  return EXIT_SUCCESS;
+}
