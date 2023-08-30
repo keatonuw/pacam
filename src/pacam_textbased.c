@@ -1,3 +1,11 @@
+/* Toy implementation for PACAM library.
+
+Copyright (C) 2023 Keaton Kowal
+
+PACAM is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,84 +17,6 @@
   Toy implementation of pacam.h which demonstrates using the interface
   for a text-based adventure type of game.
 */
-
-// game is current scene, with a list of scenes tracked for memory mgmt
-struct pacam_game
-{
-  pacam_scene *cur_scene;
-  array_list *scene_list;
-  array_list *object_list;
-};
-
-// scene has a name, desc, and list of objects it contains
-struct pacam_scene
-{
-  char name[16];
-  char desc[128];
-  array_list *object_list;
-};
-
-// an object has a name, desc, and callback to invoke when clicked.
-struct pacam_object
-{
-  char name[16];
-  char desc[128];
-  pacam_callback *on_click;
-};
-
-// psuedo-closure struct. a callback has a function to invoke, and
-// some data that the invoked function can use.
-struct pacam_callback
-{
-  void (*fn)(pacam_callback *callback, pacam_game *game);
-  void *data;
-};
-
-void dtor_no_op(void *el) {}
-
-void pacam_object_free(void *ptr)
-{
-  pacam_object *object = (pacam_object *)ptr;
-  // if there's a callback, free that.
-  if (object->on_click != NULL)
-  {
-    free(object->on_click);
-  }
-  free(object);
-}
-
-void pacam_scene_free(void *ptr)
-{
-  pacam_scene *scene = (pacam_scene *)ptr;
-  array_list_free(scene->object_list, dtor_no_op);
-  free(scene);
-}
-
-pacam_game *pacam_init()
-{
-  pacam_game *game = (pacam_game *)malloc(sizeof(pacam_game));
-  game->object_list = array_list_alloc();
-  game->scene_list = array_list_alloc();
-  return game;
-}
-
-void pacam_close(pacam_game *game)
-{
-  array_list_free(game->scene_list, pacam_scene_free);
-  array_list_free(game->object_list, pacam_object_free);
-  free(game);
-}
-
-// creates a new scene and adds it to game.
-pacam_scene *pacam_new_scene(pacam_game *game)
-{
-  pacam_scene *scene = (pacam_scene *)malloc(sizeof(pacam_scene));
-  scene->object_list = array_list_alloc();
-  scene->name[0] = '\0';
-  scene->desc[0] = '\0';
-  array_list_add(game->scene_list, scene);
-  return scene;
-}
 
 pacam_scene *pacam_text_scene(pacam_game *game, char *name, char *desc)
 {

@@ -1,3 +1,11 @@
+/* Array-based list implementation for PACAM library.
+
+Copyright (C) 2023 Keaton Kowal
+
+PACAM is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -54,24 +62,3 @@ void array_list_add(array_list *list, void *el)
   *(list->array + list->size) = el;
   list->size++;
 }
-
-/*
-int main(int argc, char **argv)
-{
-  array_list *list = array_list_alloc();
-  for (void *i = 0; i < 20; i++)
-  {
-    array_list_add(list, i);
-  }
-
-  for (int i = 0; i < array_list_size(list); i++)
-  {
-    printf("%d, ", (int)array_list_get(list, i));
-  }
-
-  array_list_free(list, dtor_no_op);
-
-  printf("\n");
-  return EXIT_SUCCESS;
-}
-*/
