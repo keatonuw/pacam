@@ -20,25 +20,36 @@ struct pacam_scene
   char desc[DESC_MAX_LEN];
   array_list *object_list;
   void *data;
+  dtor data_dtor;
 };
 
 void pacam_scene_free(void *ptr)
 {
   pacam_scene *scene = (pacam_scene *)ptr;
   array_list_free(scene->object_list, dtor_no_op);
+  if (scene->data_dtor != NULL && scene->data != NULL)
+  {
+    scene->data_dtor((void *)scene->data);
+  }
   free(scene);
 }
 
 // creates a new scene and adds it to game.
-pacam_scene *pacam_new_scene(pacam_game *game, char *name, char *desc)
+pacam_scene *pacam_new_scene(pacam_game *game, char *name, char *desc, void *data, dtor data_dtor)
 {
   pacam_scene *scene = (pacam_scene *)malloc(sizeof(pacam_scene));
   scene->object_list = array_list_alloc();
   strncpy(object->name, name, 16);
   strncpy(object->desc, desc, 128);
-  scene->data = NULL;
+  scene->data = data;
+  scene->data_dtor = data_dtor;
   pacam_register_scene(game, scene);
   return scene;
+}
+
+pacam_scene *pacam_new_scene_base(pacam_game *game, char *name, char *desc)
+{
+  return pacam_new_scene(game, name, desc, NULL, NULL);
 }
 
 void pacam_scene_set_data(pacam_scene *scene, void *data)

@@ -21,6 +21,16 @@ struct pacam_callback
   dtor data_dtor;
 };
 
+void free_callback(pacam_callback *callback)
+{
+
+  if (callback->data_dtor != NULL && callback->data != NULL)
+  {
+    callback->data_dtor(callback->data);
+  }
+  free(callback);
+}
+
 pacam_callback *create_callback(pacam_game *game,
                                 pacam_callback_handler handler,
                                 void *data, dtor data_dtor)

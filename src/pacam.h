@@ -80,8 +80,57 @@ void pacam_for_all_scenes(pacam_game *game, pacam_scene_callback fn);
 void pacam_for_all_objects(pacam_game *game, pacam_object_callback fn);
 
 //===========================================================================//
+// pacam_scene_functions
+//===========================================================================//
 
 void pacam_scene_free(void *scene);
+
+/*
+  Create a new scene with the given name and desc, then add it to the game.
+*/
+pacam_scene *pacam_new_scene(pacam_game *game, char *name, char *desc, void *data);
+
+/*
+  Create a simple scene with no data contained in it, only objects, a name, and desc.
+*/
+pacam_scene *pacam_new_scene_base(pacam_game *game, char *name, char *desc);
+
+/*
+  Set the data field for a scene. Note that the scene's data_dtor is not
+  changed. Therefore, the same dtor will be invoked when cleaning the new
+  data, so this dtor should be prepared to handle whatever data really is,
+  in memory.
+*/
+void pacam_scene_set_data(pacam_scene *scene, void *data);
+
+/*
+  Add an object to the scene.
+*/
+void pacam_scene_add_object(pacam_scene *scene, pacam_object *object);
+
+/*
+  Get the name of a scene.
+*/
+char *pacam_scene_get_name(pacam_scene *scene);
+
+/*
+  Get the desc of a scene.
+*/
+char *pacam_scene_get_desc(pacam_scene *scene);
+
+/*
+  Get the data of a scene.
+*/
+void *pacam_scene_get_data(pacam_scene *scene);
+
+/*
+  Call fn for each object in the scene.
+*/
+void *pacam_scene_for_each_object(pacam_scene *scene, pacam_object_callback fn);
+
+//===========================================================================//
+// pacam_object_functions
+//===========================================================================//
 
 void pacam_object_free(void *object);
 
