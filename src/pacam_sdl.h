@@ -45,7 +45,7 @@ typedef pacam_object v_object;
   Create a new SDL-backed "visual" object.
 */
 v_object *pacam_new_v_object(pacam_game *game, char *name, char *desc,
-                             SDL_Texture *data, point *p);
+                             pacam_callback *callback, SDL_Texture *data, point *p);
 
 /*
   Set the texture, and return the old texture.
@@ -56,6 +56,6 @@ SDL_Texture *pacam_v_object_set_texture(v_object *obj, SDL_Texture *texture);
   Handle a mouse click event at point click. If this click collided with the v_object,
   invoke its callback.
 */
-void pacam_v_obj_click(v_object obj, point *click);
+void pacam_v_obj_click(v_object *obj, point *click);
 
 #endif /* PACAM_SDL_H */

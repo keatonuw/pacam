@@ -28,7 +28,11 @@ void array_list_add(array_list *list, void *el);
 
 // point
 
-typedef struct point point;
+typedef struct point
+{
+  int x;
+  int y;
+} point;
 
 point *point_alloc(int x, int y);
 

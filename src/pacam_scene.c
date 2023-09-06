@@ -89,3 +89,13 @@ void pacam_scene_for_each_object(pacam_scene *scene, pacam_object_callback fn)
     fn((pacam_object *)array_list_get(scene->object_list, i));
   }
 }
+
+int pacam_scene_num_objects(pacam_scene *scene)
+{
+  return array_list_size(scene->object_list);
+}
+
+pacam_object *pacam_scene_get_ith_object(pacam_scene *scene, int i)
+{
+  return (pacam_object *)array_list_get(scene->object_list, i);
+}

@@ -19,6 +19,7 @@ struct pacam_object
   char desc[128];
   pacam_callback *on_click;
   void *data;
+  dtor data_dtor;
 };
 
 void pacam_object_free(void *ptr)
@@ -29,15 +30,20 @@ void pacam_object_free(void *ptr)
   {
     free_callback(object->on_click);
   }
+  if (object->data != NULL && object->data_dtor != NULL)
+  {
+    object->data_dtor(object->data);
+  }
   free(object);
 }
 
-pacam_object *pacam_new_object(pacam_game *game, char *name, char *desc, void *data, pacam_callback *callback)
+pacam_object *pacam_new_object(pacam_game *game, char *name, char *desc, void *data, dtor data_dtor, pacam_callback *callback)
 {
   pacam_object *object = (pacam_object *)malloc(sizeof(pacam_object));
   strncpy(object->name, name, 16);
   strncpy(object->desc, desc, 128);
   object->data = data;
+  object->data_dtor = data_dtor;
   object->on_click = callback;
   pacam_register_object(game, object);
   return object;
@@ -45,7 +51,7 @@ pacam_object *pacam_new_object(pacam_game *game, char *name, char *desc, void *d
 
 pacam_object *pacam_new_object_base(pacam_game *game, char *name, char *desc)
 {
-  return pacam_new_object(game, name, desc, NULL, pc_no_op(game));
+  return pacam_new_object(game, name, desc, NULL, NULL, pc_no_op(game));
 }
 
 char *pacam_object_get_name(pacam_object *object)

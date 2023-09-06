@@ -1,13 +1,15 @@
+/* Util code for PACAM library.
+
+Copyright (C) 2023 Keaton Kowal
+
+PACAM is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
+
 #include <stdlib.h>
 #include <math.h>
 
 #include "ds.h"
-
-struct point
-{
-  int x;
-  int y;
-};
 
 point *point_alloc(int x, int y)
 {

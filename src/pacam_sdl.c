@@ -12,9 +12,9 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
 
 #include <SDL.h>
 
-#include "ds.h"
 #include "pacam.h"
 #include "pacam_sdl.h"
+#include "ds.h"
 
 #define SCREEN_HEIGHT 480
 #define SCREEN_WIDTH 480
@@ -38,7 +38,7 @@ void free_texture(void *texture)
 v_scene *pacam_new_v_scene(pacam_game *game, char *name, char *desc,
                            SDL_Texture *texture)
 {
-  pacam_new_scene(game, name, desc, (void *)texture, free_texture);
+  return (v_scene *)pacam_new_scene(game, name, desc, (void *)texture, free_texture);
 }
 
 SDL_Texture *pacam_v_scene_set_texture(v_scene *scene, SDL_Texture *texture)
@@ -56,7 +56,7 @@ struct v_obj_data
 
 struct v_obj_data *v_obj_data_alloc(SDL_Texture *texture, point *p)
 {
-  struct v_obj_data *data = (v_obj_data *)malloc(sizeof(v_obj_data));
+  struct v_obj_data *data = (struct v_obj_data *)malloc(sizeof(struct v_obj_data));
   data->texture = texture;
   data->p = *p;
   return data;
@@ -70,9 +70,9 @@ void v_obj_data_free(void *p)
 }
 
 v_object *pacam_new_v_object(pacam_game *game, char *name, char *desc,
-                             SDL_Texture *texture, point *p)
+                             pacam_callback *callback, SDL_Texture *texture, point *p)
 {
-  return pacam_new_object(game, name, desc, (void *)v_obj_data_alloc(texture, p), v_obj_data_free);
+  return pacam_new_object(game, name, desc, (void *)v_obj_data_alloc(texture, p), v_obj_data_free, callback);
 }
 
 SDL_Texture *pacam_v_object_set_texture(v_object *obj, SDL_Texture *texture)
@@ -82,12 +82,27 @@ SDL_Texture *pacam_v_object_set_texture(v_object *obj, SDL_Texture *texture)
   return old;
 }
 
-void pacam_v_obj_click(v_object obj, point *click)
+void pacam_v_obj_click(v_object *obj, point *click)
 {
-  // TODO
+  // get bounding points
+  int x_left, y_top, x_right, y_bottom;
+  struct v_obj_data *data = (struct v_obj_data *)pacam_object_get_data((pacam_object *)obj);
+  x_left = point_x(&data->p);
+  y_top = point_y(&data->p);
+  SDL_QueryTexture(data->texture, NULL, NULL, &x_right, &y_bottom);
+  x_right += x_left;
+  y_bottom += y_top;
+
   // if click is inside of rectangle defined by
   // a top left object point corner and bottom right
   // point + (w,h), invoke obj's callback.
+  if (point_x(click) >= x_left && point_x(click) <= x_right)
+  {
+    if (point_y(click) >= y_top && point_y(click) <= y_bottom)
+    {
+      pacam_object_interact((pacam_object *)obj);
+    }
+  }
   // otherwise, noop.
 }
 
@@ -96,6 +111,13 @@ void pacam_v_obj_click(v_object obj, point *click)
 
 int handle_mouse_click(pacam_game *game, int x, int y)
 {
+  point p = {x, y};
+
+  pacam_scene *scene = pacam_get_cur_scene(game);
+  for (int i = 0; i < pacam_scene_num_objects(scene); i++)
+  {
+    pacam_v_obj_click((v_object *)pacam_scene_get_ith_object(scene, i), &p);
+  }
 
   return 0;
 }
@@ -146,7 +168,7 @@ void do_input(pacam_game *game)
       break;
     case SDL_MOUSEBUTTONUP:
       mouse_event = event.button;
-      printf("click @ (%d, %d)\n", mouse_event.x, mouse_event.y);
+      handle_mouse_click(game, mouse_event.x, mouse_event.y);
       break;
     default:
       break;
@@ -171,6 +193,8 @@ void pacam_run(pacam_game *game, pacam_scene *scene)
   memset(&app, 0, sizeof(pacam_window));
 
   init_SDL(&app);
+
+  pacam_set_cur_scene(game, scene);
 
   while (1)
   {

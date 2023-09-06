@@ -146,6 +146,10 @@ void *pacam_scene_get_data(pacam_scene *scene);
 void pacam_scene_for_each_object(pacam_scene *scene,
                                  pacam_object_callback fn);
 
+int pacam_scene_num_objects(pacam_scene *scene);
+
+pacam_object *pacam_scene_get_ith_object(pacam_scene *scene, int i);
+
 //===========================================================================//
 // pacam_object functions
 //===========================================================================//
@@ -159,7 +163,7 @@ void pacam_object_free(void *object);
   Create a new object.
 */
 pacam_object *pacam_new_object(pacam_game *game, char *name, char *desc,
-                               void *data, pacam_callback *callback);
+                               void *data, dtor clean, pacam_callback *callback);
 
 /*
   Create a new object with only a name and desc, no callback.
@@ -180,6 +184,11 @@ char *pacam_object_get_desc(pacam_object *object);
   Get the data of an object.
 */
 void *pacam_object_get_data(pacam_object *object);
+
+/*
+  Set the data of an object.
+*/
+void pacam_object_set_data(pacam_object *object, void *data);
 
 /*
   Interact with an object, invoking its callback.
