@@ -26,4 +26,20 @@ int array_list_size(array_list *list);
 
 void array_list_add(array_list *list, void *el);
 
+// point
+
+typedef struct point point;
+
+point *point_alloc(int x, int y);
+
+void point_free(point *p);
+
+int point_compare(point *point_a, point *point_b);
+
+point *point_add(point *left, point *right);
+
+int point_x(point *p);
+
+int point_y(point *p);
+
 #endif /* DS_H */
