@@ -59,6 +59,7 @@ void initSDL(App *app)
 void doInput(pacam_game *game)
 {
   SDL_Event event;
+  SDL_MouseButtonEvent mouse_event;
   while (SDL_PollEvent(&event))
   {
     switch (event.type)
@@ -66,6 +67,10 @@ void doInput(pacam_game *game)
     case SDL_QUIT:
       pacam_close(game);
       exit(EXIT_SUCCESS);
+      break;
+    case SDL_MOUSEBUTTONUP:
+      mouse_event = event.button;
+      printf("click @ (%d, %d)\n", mouse_event.x, mouse_event.y);
       break;
     default:
       break;
