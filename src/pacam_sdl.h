@@ -14,6 +14,17 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
 #include "ds.h"
 #include "pacam.h"
 
+typedef struct pacam_window
+{
+  SDL_Renderer *renderer;
+  SDL_Window *window;
+  pacam_game *game;
+} pacam_window;
+
+typedef void (*setup_callback)(pacam_window *window);
+
+void pacam_run_sdl(pacam_game *game, setup_callback fn);
+
 //===========================================================================//
 // scene wrapper functions
 //===========================================================================//
@@ -34,6 +45,9 @@ v_scene *pacam_new_v_scene(pacam_game *game, char *name, char *desc,
   Set the texture. The old texture is returned.
 */
 SDL_Texture *pacam_v_scene_set_texture(v_scene *scene, SDL_Texture *texture);
+
+v_scene *pacam_v_scene(pacam_window *window, char *name, char *desc,
+                       char *filename);
 
 //===========================================================================//
 // object wrapper functions
@@ -57,5 +71,8 @@ SDL_Texture *pacam_v_object_set_texture(v_object *obj, SDL_Texture *texture);
   invoke its callback.
 */
 void pacam_v_obj_click(v_object *obj, point *click);
+
+v_object *pacam_v_object(pacam_window *window, char *name, char *desc,
+                         pacam_callback *callback, char *texture_filename, int x, int y);
 
 #endif /* PACAM_SDL_H */

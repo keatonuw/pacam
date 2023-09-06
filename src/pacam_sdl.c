@@ -11,6 +11,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
 #include <string.h>
 
 #include <SDL.h>
+#include <SDL_image.h>
 
 #include "pacam.h"
 #include "pacam_sdl.h"
@@ -22,13 +23,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. */
 /*
   Holds the SDL window & renderer.
 */
-typedef struct pacam_window pacam_window;
-
-struct pacam_window
-{
-  SDL_Renderer *renderer;
-  SDL_Window *window;
-};
 
 void free_texture(void *texture)
 {
@@ -39,6 +33,13 @@ v_scene *pacam_new_v_scene(pacam_game *game, char *name, char *desc,
                            SDL_Texture *texture)
 {
   return (v_scene *)pacam_new_scene(game, name, desc, (void *)texture, free_texture);
+}
+
+v_scene *pacam_v_scene(pacam_window *window, char *name, char *desc, char *texture_filename)
+{
+  SDL_Texture *text = IMG_LoadTexture(window->renderer, texture_filename);
+
+  return pacam_new_v_scene(window->game, name, desc, text);
 }
 
 SDL_Texture *pacam_v_scene_set_texture(v_scene *scene, SDL_Texture *texture)
@@ -75,6 +76,14 @@ v_object *pacam_new_v_object(pacam_game *game, char *name, char *desc,
   return pacam_new_object(game, name, desc, (void *)v_obj_data_alloc(texture, p), v_obj_data_free, callback);
 }
 
+v_object *pacam_v_object(pacam_window *window, char *name, char *desc,
+                         pacam_callback *callback, char *texture_filename, int x, int y)
+{
+  SDL_Texture *text = IMG_LoadTexture(window->renderer, texture_filename);
+  point p = {x, y};
+  return pacam_new_v_object(window->game, name, desc, callback, text, &p);
+}
+
 SDL_Texture *pacam_v_object_set_texture(v_object *obj, SDL_Texture *texture)
 {
   SDL_Texture *old = (SDL_Texture *)pacam_object_get_data((pacam_object *)obj);
@@ -105,9 +114,6 @@ void pacam_v_obj_click(v_object *obj, point *click)
   }
   // otherwise, noop.
 }
-
-// TODO: add a shortcut to create an object from a filename
-// as opposed to a full SDL_Texture. Same for scenes.
 
 int handle_mouse_click(pacam_game *game, int x, int y)
 {
@@ -176,10 +182,33 @@ void do_input(pacam_game *game)
   }
 }
 
+void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, int x, int y)
+{
+  SDL_Rect dest;
+  dest.x = x;
+  dest.y = y;
+  SDL_QueryTexture(texture, NULL, NULL, &dest.w, &dest.h);
+  SDL_RenderCopy(renderer, texture, NULL, &dest);
+}
+
 void prepare_scene(pacam_window *app)
 {
   SDL_SetRenderDrawColor(app->renderer, 96, 128, 255, 255);
   SDL_RenderClear(app->renderer);
+
+  pacam_game *game = app->game;
+  pacam_scene *cur_scene = pacam_get_cur_scene(game);
+  if (cur_scene == NULL)
+  {
+    return;
+  }
+
+  draw_texture(app->renderer, (SDL_Texture *)pacam_scene_get_data(cur_scene), 0, 0);
+  for (int i = 0; i < pacam_scene_num_objects(cur_scene); i++)
+  {
+    struct v_obj_data *data = (struct v_obj_data *)pacam_object_get_data(pacam_scene_get_ith_object(cur_scene, i));
+    draw_texture(app->renderer, data->texture, data->p.x, data->p.y);
+  }
 }
 
 void present_scene(pacam_window *app)
@@ -187,14 +216,17 @@ void present_scene(pacam_window *app)
   SDL_RenderPresent(app->renderer);
 }
 
-void pacam_run(pacam_game *game, pacam_scene *scene)
+void pacam_run_sdl(pacam_game *game, setup_callback game_fn)
 {
   pacam_window app;
   memset(&app, 0, sizeof(pacam_window));
 
   init_SDL(&app);
 
-  pacam_set_cur_scene(game, scene);
+  app.game = game;
+
+  /* Create scenes & objects at this point - callback? */
+  game_fn(&app);
 
   while (1)
   {

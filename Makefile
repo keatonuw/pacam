@@ -5,7 +5,7 @@ CC := gcc
 CFLAGS := $(shell sdl2-config --cflags) -g
 
 # Linker flags
-LDFLAGS := $(shell sdl2-config --libs)
+LDFLAGS := $(shell sdl2-config --libs) -lSDL2_image
 
 # Target executable
 TARGET := pacam
